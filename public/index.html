@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D@Cvistacomousadia - BE THE ONE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: white; }
+        .glass { background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .product-card:hover img { transform: scale(1.1); }
+        #image-modal { display: none; }
+        #image-modal.active { display: flex; }
+    </style>
+</head>
+<body>
+
+    <!-- Navegação -->
+    <nav class="fixed top-0 w-full z-50 py-4 glass">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex gap-6 text-[10px] font-bold uppercase tracking-widest hidden lg:flex">
+                <a href="#produtos" class="hover:text-blue-500 transition">Lançamentos</a>
+                <a href="#sobre" class="hover:text-blue-500 transition">Sobre Nós</a>
+                <a href="#manifesto" class="hover:text-blue-500 transition">Manifesto</a>
+                <a href="mailto:daccumbe@gmail.com" class="hover:text-blue-500 transition">Contato</a>
+            </div>
+            <button onclick="toggleMobileMenu()" class="lg:hidden">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <a href="#" class="flex items-center">
+                <img src="/logo.png" alt="D@C Logo" class="h-10 w-auto">
+            </a>
+            <div class="flex items-center gap-4">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu-backdrop" class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-lg hidden" onclick="toggleMobileMenu()"></div>
+    <div id="mobile-menu" class="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm z-[70] bg-slate-950 p-8 flex flex-col text-white shadow-2xl transition-transform -translate-x-full duration-300 ease-in-out">
+        <div class="flex justify-between items-center mb-12">
+            <a href="#" class="flex items-center">
+                <img src="/logo.png" alt="D@C Logo" class="h-10 w-auto">
+            </a>
+            <button onclick="toggleMobileMenu()">
+                <i data-lucide="x" class="w-8 h-8 text-zinc-400"></i>
+            </button>
+        </div>
+        <div class="flex flex-col gap-8">
+            <a href="#produtos" onclick="toggleMobileMenu()" class="text-4xl font-bold tracking-tight hover:text-blue-500 transition">Lançamentos</a>
+            <a href="#sobre" onclick="toggleMobileMenu()" class="text-4xl font-bold tracking-tight hover:text-blue-500 transition">Sobre Nós</a>
+            <a href="#manifesto" onclick="toggleMobileMenu()" class="text-4xl font-bold tracking-tight hover:text-blue-500 transition">Manifesto</a>
+            <a href="mailto:daccumbe@gmail.com" onclick="toggleMobileMenu()" class="text-4xl font-bold tracking-tight hover:text-blue-500 transition">Contato</a>
+        </div>
+        <div class="mt-auto pt-12 border-t border-white/5">
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-6">Siga-nos</p>
+            <div class="flex gap-6">
+                <a href="https://wa.me/258833950740" class="hover:text-blue-500 transition"><i data-lucide="message-circle"></i></a>
+                <a href="https://www.facebook.com/share/18VY1GmVej/" class="hover:text-blue-500 transition"><i data-lucide="facebook"></i></a>
+                <a href="https://www.instagram.com/da_cumbe?igsh=MTE4ZG5jeWloOThjaw==" target="_blank" class="hover:text-blue-500 transition"><i data-lucide="instagram"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="relative h-screen flex items-center justify-center text-center px-6 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40"></div>
+        </div>
+        <div class="relative z-10 max-w-4xl">
+            <div class="inline-block bg-blue-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6">Lançamento em Março</div>
+            <h1 class="text-6xl md:text-8xl font-bold tracking-tighter leading-none mb-8">MARÇO JÁ <br><span class="text-blue-500">TEM DONO.</span></h1>
+            <p class="text-lg text-zinc-300 mb-10 max-w-xl mx-auto">Não é só uma camiseta. É posicionamento. Minimalista. Poderoso. Direto.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://wa.me/258833950740" class="bg-white text-black px-10 py-4 rounded-full font-bold hover:bg-blue-600 hover:text-white transition">EU SOU O UM</a>
+                <a href="mailto:daccumbe@gmail.com" class="border border-white/30 px-10 py-4 rounded-full font-bold hover:bg-white/10 transition">Contato Direto</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produtos -->
+    <section id="produtos" class="py-24 px-6 max-w-7xl mx-auto">
+        <h2 class="text-4xl font-bold mb-16 text-center">Agendadas para Março</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Produto 1 -->
+            <div class="product-card group cursor-pointer" onclick="openModal('/product1.png')">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-900 mb-4">
+                    <img src="/product1.png" class="w-full h-full object-cover transition duration-700 opacity-90 group-hover:opacity-100 group-hover:scale-110" alt="D@C be the one" referrerpolicy="no-referrer">
+                </div>
+                <h3 class="font-bold text-lg">D@C be the one</h3>
+                <p class="text-zinc-500 text-sm mb-2">Branco - 100% algodão</p>
+                <p class="text-blue-500 font-bold mb-4">Em breve</p>
+                <a href="mailto:daccumbe@gmail.com?subject=Reserva: D@C be the one" class="block w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-center text-xs hover:bg-white hover:text-blue-600 transition" onclick="event.stopPropagation()">RESERVAR</a>
+            </div>
+            <!-- Produto 2 -->
+            <div class="product-card group cursor-pointer" onclick="openModal('/product2.png')">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-900 mb-4">
+                    <img src="/product2.png" class="w-full h-full object-cover transition duration-700 opacity-90 group-hover:opacity-100 group-hover:scale-110" alt="D@C be the one" referrerpolicy="no-referrer">
+                </div>
+                <h3 class="font-bold text-lg">D@C be the one</h3>
+                <p class="text-zinc-500 text-sm mb-2">Preto & Branco - 100% algodão</p>
+                <p class="text-blue-500 font-bold mb-4">Em breve</p>
+                <a href="mailto:daccumbe@gmail.com?subject=Reserva: D@C be the one" class="block w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-center text-xs hover:bg-white hover:text-blue-600 transition" onclick="event.stopPropagation()">RESERVAR</a>
+            </div>
+            <!-- Produto 3 -->
+            <div class="product-card group cursor-pointer" onclick="openModal('/product3.png')">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-900 mb-4">
+                    <img src="/product3.png" class="w-full h-full object-cover transition duration-700 opacity-90 group-hover:opacity-100 group-hover:scale-110" alt="D@C be the one" referrerpolicy="no-referrer">
+                </div>
+                <h3 class="font-bold text-lg">D@C be the one</h3>
+                <p class="text-zinc-500 text-sm mb-2">Azul Escuro - 100% algodão</p>
+                <p class="text-blue-500 font-bold mb-4">Em breve</p>
+                <a href="mailto:daccumbe@gmail.com?subject=Reserva: D@C be the one" class="block w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-center text-xs hover:bg-white hover:text-blue-600 transition" onclick="event.stopPropagation()">RESERVAR</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre Nós -->
+    <section id="sobre" class="py-24 px-6 bg-slate-900/30">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative aspect-[4/5] rounded-3xl overflow-hidden border border-white/5">
+                <img src="https://picsum.photos/seed/about2/800/1000" class="w-full h-full object-cover opacity-50" alt="Sobre D@C" referrerpolicy="no-referrer">
+                <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                <div class="absolute bottom-12 left-12">
+                    <p class="text-3xl font-bold">D@C</p>
+                    <p class="text-blue-500 text-xs uppercase tracking-widest">Vista com Ousadia</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-blue-500 font-bold uppercase tracking-widest text-xs mb-6">Sobre Nós</h3>
+                <h2 class="text-5xl font-bold tracking-tight mb-8">Mais do que uma marca — somos uma identidade.</h2>
+                <div class="space-y-6 text-zinc-400 text-lg leading-relaxed">
+                    <p>A <span class="text-white font-bold">D@C Vista com Ousadia</span> nasceu com a missão de transformar a forma de vestir em uma verdadeira expressão de ousadia, estilo e personalidade.</p>
+                    <p>Trabalhamos com foco na qualidade, nas tendências e na satisfação dos nossos clientes, oferecendo produtos que combinam elegância e autenticidade.</p>
+                    <p>Somos mais do que uma marca — somos uma identidade.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manifesto -->
+    <section id="manifesto" class="py-24 px-6 bg-slate-950">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h3 class="text-blue-500 font-bold uppercase tracking-widest text-xs mb-6">Manifesto D@C</h3>
+                <h2 class="text-5xl font-bold tracking-tight mb-8">Se você entende a mensagem, você já sabe o que fazer.</h2>
+                <p class="text-zinc-400 text-lg leading-relaxed mb-8">Produção limitada. Sem repetição para todos. D@C não é apenas vestuário, é uma declaração de quem você é. Branco, Azul Escuro e Preto - as cores do poder minimalista.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h4 class="font-bold mb-2">Poderoso</h4>
+                        <p class="text-zinc-500 text-sm">Feito para quem lidera, não para quem segue.</p>
+                    </div>
+                    <div class="border-l-2 border-zinc-700 pl-6">
+                        <h4 class="font-bold mb-2">Direto</h4>
+                        <p class="text-zinc-500 text-sm">Sem distrações. Apenas o essencial.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="aspect-square bg-slate-900 rounded-3xl flex items-center justify-center border border-white/5">
+                    <span class="text-zinc-700 font-bold text-4xl">BE THE ONE</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-24 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <a href="#" class="mb-6 block">
+                    <img src="/logo.png" alt="D@C Logo" class="h-10 w-auto">
+                </a>
+                <p class="text-zinc-500 text-sm">Minimalista. Poderoso. Direto. A marca que define o seu posicionamento.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-xs uppercase tracking-widest mb-8 text-zinc-400">Contato</h4>
+                <ul class="text-zinc-500 space-y-4 text-sm">
+                    <li><a href="mailto:daccumbe@gmail.com" class="hover:text-white transition">daccumbe@gmail.com</a></li>
+                    <li><a href="https://wa.me/258833950740" class="hover:text-white transition">+258 83 395 0740</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-xs uppercase tracking-widest mb-8 text-zinc-400">Redes Sociais</h4>
+                <div class="flex gap-4">
+                    <a href="https://wa.me/258833950740" class="p-3 bg-zinc-900 rounded-full hover:text-blue-500 transition"><i data-lucide="message-circle"></i></a>
+                    <a href="https://www.facebook.com/share/18VY1GmVej/" class="p-3 bg-zinc-900 rounded-full hover:text-blue-500 transition"><i data-lucide="facebook"></i></a>
+                    <a href="https://www.instagram.com/da_cumbe?igsh=MTE4ZG5jeWloOThjaw==" target="_blank" class="p-3 bg-zinc-900 rounded-full hover:text-blue-500 transition"><i data-lucide="instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-24 pt-12 border-t border-white/5 text-center text-xs text-zinc-600">
+            © 2024 D@Cvistacomousadia. Todos os direitos reservados.
+        </div>
+    </footer>
+
+    <!-- Modal de Imagem -->
+    <div id="image-modal" class="fixed inset-0 z-[100] bg-black/95 items-center justify-center p-4 md:p-12 cursor-pointer" onclick="closeModal()">
+        <button class="absolute top-8 right-8 text-white hover:text-blue-500 transition-colors">
+            <i data-lucide="x" class="w-10 h-10"></i>
+        </button>
+        <img id="modal-img" src="" alt="Full view" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" referrerpolicy="no-referrer">
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/258833950740?text=Olá,%20visitei%20o%20site%20D@CVistacomOusadia%20e%20gostaria%20de%20fazer%20uma%20compra." target="_blank" class="fixed bottom-8 right-8 z-[90] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 group">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .004 5.412 0 12.048c0 2.123.554 4.197 1.608 6.037L0 24l6.105-1.602a11.832 11.832 0 005.937 1.598h.005c6.637 0 12.048-5.414 12.052-12.05a11.824 11.824 0 00-3.545-8.503z"/>
+        </svg>
+    </a>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            const isOpen = !menu.classList.contains('-translate-x-full');
+
+            if (isOpen) {
+                menu.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            } else {
+                menu.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function openModal(url) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-img');
+            img.src = url;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('image-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
