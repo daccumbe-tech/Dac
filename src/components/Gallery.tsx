@@ -17,8 +17,8 @@ const ALL_PRODUCTS: Product[] = [
   {
     id: 1,
     name: "D@C be the one",
-    price: 0,
-    priceDisplay: "Em breve",
+    price: 750,
+    priceDisplay: "750mt",
     color: "Branco",
     image: "/product1.png",
     category: "Premium",
@@ -27,8 +27,8 @@ const ALL_PRODUCTS: Product[] = [
   {
     id: 2,
     name: "D@C be the one",
-    price: 0,
-    priceDisplay: "Em breve",
+    price: 1300,
+    priceDisplay: "1300mt",
     color: "Preto & Branco",
     image: "/product2.png",
     category: "premium",
@@ -37,8 +37,8 @@ const ALL_PRODUCTS: Product[] = [
   {
     id: 3,
     name: "D@C be the one",
-    price: 0,
-    priceDisplay: "Em breve",
+    price: 750,
+    priceDisplay: "750mt",
     color: "Azul Escuro",
     image: "/product3.png",
     category: "Premium",
@@ -54,7 +54,7 @@ export default function Gallery({ onImageClick, onAddToCart }: { onImageClick: (
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [productStates, setProductStates] = useState<Record<number, { size: string, quantity: number }>>({});
 
-  const getProductState = (id: number) => productStates[id] || { size: 'M', quantity: 1 };
+  const getProductState = (id: number) => productStates[id] || { size: 'M', quantity: 0 };
   const updateProductState = (id: number, updates: any) => {
     setProductStates(prev => ({
       ...prev,
@@ -258,10 +258,15 @@ export default function Gallery({ onImageClick, onAddToCart }: { onImageClick: (
                     getProductState(product.id).size,
                     getProductState(product.id).quantity
                   )}
-                  className="w-full bg-blue-600 hover:bg-white hover:text-blue-600 text-white py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2"
+                  disabled={getProductState(product.id).quantity === 0}
+                  className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                    getProductState(product.id).quantity === 0 
+                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-white hover:text-blue-600 text-white'
+                  }`}
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  RESERVAR
+                  COMPRAR
                 </button>
               </div>
             </motion.div>

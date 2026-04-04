@@ -18,7 +18,7 @@ const PRODUCTS = [
   {
     id: 1,
     name: "D@C be the one",
-    price: "Em breve",
+    price: "750mt",
     color: "Branco",
     image: "/product1.png", // input_file_0.png
     category: "Premium",
@@ -27,7 +27,7 @@ const PRODUCTS = [
   {
     id: 2,
     name: "D@C be the one",
-    price: "Em breve",
+    price: "1300mt",
     color: "Preto & Branco",
     image: "/product2.png", // input_file_1.png
     category: "premium",
@@ -36,7 +36,7 @@ const PRODUCTS = [
   {
     id: 3,
     name: "D@C be the one",
-    price: "Em breve",
+    price: "750mt",
     color: "Azul Escuro",
     image: "/product3.png", // input_file_2.png
     category: "Premium",
@@ -49,7 +49,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const [productStates, setProductStates] = useState<Record<number, { size: string, quantity: number }>>({});
 
-  const getProductState = (id: number) => productStates[id] || { size: 'M', quantity: 1 };
+  const getProductState = (id: number) => productStates[id] || { size: 'M', quantity: 0 };
   const updateProductState = (id: number, updates: any) => {
     setProductStates(prev => ({
       ...prev,
@@ -71,8 +71,8 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 bg-blue-600 px-4 py-1 rounded-full font-bold tracking-[0.2em] uppercase text-[10px] mb-6 shadow-lg shadow-blue-600/20"
           >
-            <Calendar className="w-3 h-3" />
-            Lançamento em Março
+            <CheckCircle className="w-3 h-3" />
+            15% de desconto na primeira compra
           </motion.div>
           <motion.h2 
             initial={{ opacity: 0, y: 30 }}
@@ -80,8 +80,8 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
             transition={{ delay: 0.2 }}
             className="text-6xl md:text-8xl font-display font-bold tracking-tighter leading-none mb-8"
           >
-            MARÇO JÁ <br />
-            <span className="text-blue-500">TEM DONO.</span>
+            VISTA COM <br />
+            <span className="text-blue-500">OUSADIA.</span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -119,7 +119,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div>
             <h3 className="text-xs font-bold text-blue-500 tracking-[0.2em] uppercase mb-4">A Coleção</h3>
-            <h2 className="text-4xl font-display font-bold tracking-tight">Agendadas para Março</h2>
+            <h2 className="text-4xl font-display font-bold tracking-tight">Essenciais D@C</h2>
           </div>
           <Link to="/gallery" className="text-sm font-bold flex items-center gap-2 border-b border-white/30 pb-1 hover:text-blue-400 hover:border-blue-400 transition-all">
             Ver Todos os Detalhes <ChevronRight className="w-4 h-4" />
@@ -196,10 +196,15 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
                     getProductState(product.id).size,
                     getProductState(product.id).quantity
                   )}
-                  className="w-full bg-blue-600 hover:bg-white hover:text-blue-600 text-white py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2"
+                  disabled={getProductState(product.id).quantity === 0}
+                  className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                    getProductState(product.id).quantity === 0 
+                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-white hover:text-blue-600 text-white'
+                  }`}
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  RESERVAR PARA MARÇO
+                  COMPRAR
                 </button>
               </div>
             </motion.div>
@@ -289,7 +294,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
       <section className="py-24 px-6 bg-blue-700 text-white text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-8">Comenta: EU SOU O UM</h2>
-          <p className="text-blue-100 text-lg mb-10">Segue a página. Fica pronto para março. O estoque é limitado e não haverá reposição.</p>
+          <p className="text-blue-100 text-lg mb-10">Segue a página. Fica pronto para a nova era. O estoque é limitado e não haverá reposição.</p>
           <div className="flex justify-center gap-6">
             <a href="#" className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold hover:bg-slate-950 hover:text-white transition-all flex items-center gap-2 shadow-lg">
               <Instagram className="w-5 h-5" />
@@ -307,8 +312,33 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isReserving, setIsReserving] = useState(false);
+  const [reservationSuccess, setReservationSuccess] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const location = useLocation();
+
+  const handleReservation = async () => {
+    setIsReserving(true);
+    try {
+      const response = await fetch("/api/reserve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems }),
+      });
+      if (response.ok) {
+        setReservationSuccess(true);
+        setTimeout(() => {
+          setCartItems([]);
+          setCartOpen(false);
+          setReservationSuccess(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Erro ao enviar reserva:", error);
+    } finally {
+      setIsReserving(false);
+    }
+  };
 
   const addToCart = (product: any, size: string, quantity: number) => {
     setCartItems(prev => {
@@ -456,17 +486,36 @@ export default function App() {
                 <div className="p-6 border-t border-white/10 bg-slate-900/50">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-zinc-400 text-sm uppercase tracking-widest font-bold">Total Estimado</span>
-                    <span className="text-xl font-display font-bold text-blue-500">Em breve</span>
+                    <span className="text-xl font-display font-bold text-blue-500">
+                      {cartItems.reduce((acc, item) => {
+                        const price = parseInt(item.price.replace('mt', '')) || 0;
+                        return acc + (price * item.quantity);
+                      }, 0)}mt
+                    </span>
                   </div>
-                  <a 
-                    href={`mailto:daccumbe@gmail.com?subject=Reserva de Pedido&body=Olá, gostaria de confirmar a reserva dos seguintes itens:%0D%0A%0D%0A${cartItems.map(item => `- ${item.name} (${item.color}, Tam: ${item.size}, Qtd: ${item.quantity})`).join('%0D%0A')}`}
-                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-white hover:text-blue-600 transition-all shadow-lg shadow-blue-600/20"
-                  >
-                    <CheckCircle className="w-5 h-5" />
-                    CONFIRMAR RESERVA POR E-MAIL
-                  </a>
+                  
+                  {reservationSuccess ? (
+                    <div className="bg-green-500/20 border border-green-500 text-green-500 p-4 rounded-xl flex items-center gap-3 mb-4">
+                      <CheckCircle className="w-5 h-5" />
+                      <p className="text-xs font-bold">Reserva enviada com sucesso!</p>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={handleReservation}
+                      disabled={isReserving}
+                      className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-white hover:text-blue-600 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
+                    >
+                      {isReserving ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-5 h-5" />
+                      )}
+                      {isReserving ? "PROCESSANDO..." : "CONFIRMAR COMPRA"}
+                    </button>
+                  )}
+                  
                   <p className="text-[10px] text-center text-zinc-500 mt-4 uppercase tracking-widest leading-relaxed">
-                    Ao confirmar, você será redirecionado para o seu e-mail para finalizar o contato conosco.
+                    Ao confirmar, uma notificação será enviada para nossa equipe para processar seu pedido.
                   </p>
                 </div>
               )}
@@ -579,7 +628,7 @@ export default function App() {
             <div>
               <h4 className="font-bold text-xs uppercase tracking-[0.2em] mb-8 text-zinc-400">Coleção</h4>
               <ul className="flex flex-col gap-4 text-sm text-zinc-500">
-                <li><Link to="/gallery" className="hover:text-white transition-colors">Lançamento Março</Link></li>
+                <li><Link to="/gallery" className="hover:text-white transition-colors">Coleção Premium</Link></li>
                 <li><Link to="/gallery" className="hover:text-white transition-colors">Essential White</Link></li>
                 <li><Link to="/gallery" className="hover:text-white transition-colors">Midnight Navy</Link></li>
                 <li><Link to="/gallery" className="hover:text-white transition-colors">Classic Black</Link></li>
@@ -613,7 +662,7 @@ export default function App() {
             <div className="flex gap-8 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
               <span>#BeTheOne</span>
               <span>#VistaComOusadia</span>
-              <span>#LançamentoMarço</span>
+              <span>#PremiumStyle</span>
             </div>
           </div>
         </div>
