@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
-import { ShoppingBag, Menu, X, ArrowRight, Instagram, MessageCircle, Facebook, ChevronRight, Calendar, Trash2, CheckCircle } from 'lucide-react';
+import { ShoppingBag, Menu, X, ArrowRight, Instagram, MessageCircle, Facebook, ChevronRight, Calendar, Trash2, CheckCircle, Layout, RefreshCw, Target, Globe, Check } from 'lucide-react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import Gallery from './components/Gallery';
 
@@ -42,6 +42,40 @@ const PRODUCTS = [
     category: "Premium",
     description: "100% algodão"
   }
+];
+
+const SERVICES = [
+  {
+    id: 1,
+    title: "Criação de Websites Profissionais",
+    description: "Criamos websites simples, rápidos e funcionais para ajudar o seu negócio a ter presença online e atrair mais clientes.",
+    icon: "Layout"
+  },
+  {
+    id: 2,
+    title: "Atualização de Websites Existentes",
+    description: "Modernizamos seu site antigo com novas tecnologias e design responsivo.",
+    icon: "RefreshCw"
+  },
+  {
+    id: 3,
+    title: "Criação de Landing Pages",
+    description: "Páginas focadas em conversão para campanhas específicas e lançamentos.",
+    icon: "Target"
+  },
+  {
+    id: 4,
+    title: "Publicação de Sites na Internet",
+    description: "Cuidamos de todo o processo de hospedagem e domínio para você.",
+    icon: "Globe"
+  }
+];
+
+const BENEFITS = [
+  "Seu negócio online 24h",
+  "Mais clientes e visibilidade",
+  "Acesso fácil pelo telemóvel",
+  "Mais credibilidade"
 ];
 
 function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => void, onAddToCart: (product: any, size: string, quantity: number) => void }) {
@@ -101,9 +135,14 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
               EU SOU O UM
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="bg-transparent text-white border border-white/30 px-10 py-4 rounded-full font-bold hover:bg-white/10 transition-all">
+            <a 
+              href="https://www.facebook.com/share/18VY1GmVej/" 
+              target="_blank" 
+              rel="noreferrer"
+              className="bg-transparent text-white border border-white/30 px-10 py-4 rounded-full font-bold hover:bg-white/10 transition-all text-center"
+            >
               Ver Manifesto
-            </button>
+            </a>
           </motion.div>
         </div>
 
@@ -115,7 +154,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
       </section>
 
       {/* Featured Products */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="produtos" className="py-24 px-6 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div>
             <h3 className="text-xs font-bold text-blue-500 tracking-[0.2em] uppercase mb-4">A Coleção</h3>
@@ -212,6 +251,73 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
         </div>
       </section>
 
+      {/* Services Section */}
+      <section id="servicos" className="py-24 px-6 bg-slate-950 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16 text-center lg:text-left">
+            <h3 className="text-xs font-bold text-blue-500 tracking-[0.2em] uppercase mb-4">Soluções Digitais</h3>
+            <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-6">Criação de Websites Profissionais</h2>
+            <p className="text-zinc-400 max-w-2xl text-lg leading-relaxed">
+              Criamos websites simples, rápidos e funcionais para ajudar o seu negócio a ter presença online e atrair mais clientes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {SERVICES.map((service) => (
+              <motion.div 
+                key={service.id}
+                whileHover={{ y: -5 }}
+                className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all flex flex-col"
+              >
+                <div className="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-6">
+                  {service.icon === "Layout" && <Layout className="w-6 h-6 text-blue-500" />}
+                  {service.icon === "RefreshCw" && <RefreshCw className="w-6 h-6 text-blue-500" />}
+                  {service.icon === "Target" && <Target className="w-6 h-6 text-blue-500" />}
+                  {service.icon === "Globe" && <Globe className="w-6 h-6 text-blue-500" />}
+                </div>
+                <h4 className="text-lg font-display font-bold mb-4">{service.title}</h4>
+                <p className="text-zinc-500 text-sm leading-relaxed">
+                  {service.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="bg-blue-600/5 rounded-[2rem] p-8 md:p-12 border border-blue-600/10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h4 className="text-2xl font-display font-bold mb-8">Por que ter um site conosco?</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {BENEFITS.map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-zinc-300 font-medium">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col items-center lg:items-end gap-6">
+                <div className="text-center lg:text-right">
+                  <p className="text-zinc-400 text-sm mb-2 uppercase tracking-widest font-bold">Consultoria Gratuita</p>
+                  <p className="text-2xl font-display font-bold text-white">Armando Lucas Cumbe</p>
+                </div>
+                <a 
+                  href="https://wa.me/258833950740?text=Olá,%20Armando.%20Gostaria%20de%20saber%20mais%20sobre%20a%20criação%20de%20websites%20profissionais." 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="bg-white text-black px-10 py-5 rounded-full font-bold hover:bg-blue-600 hover:text-white transition-all flex items-center gap-3 shadow-xl shadow-white/5 group"
+                >
+                  👉 Falar no WhatsApp
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Brand Philosophy */}
       <section id="manifesto" className="bg-slate-900 text-white py-24 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -223,7 +329,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
             <p className="text-zinc-400 text-lg mb-10 leading-relaxed">
               Produção limitada. Sem repetição para todos. D@C não é apenas vestuário, é uma declaração de quem você é. Branco, Azul Escuro e Preto - as cores do poder minimalista.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
               <div className="border-l-2 border-blue-600 pl-6">
                 <h4 className="text-xl font-display font-bold mb-2">Poderoso</h4>
                 <p className="text-zinc-500 text-sm">Feito para quem lidera, não para quem segue.</p>
@@ -233,6 +339,15 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
                 <p className="text-zinc-500 text-sm">Sem distrações. Apenas o essencial.</p>
               </div>
             </div>
+            <a 
+              href="https://www.facebook.com/share/18VY1GmVej/" 
+              target="_blank" 
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-blue-600 transition-all shadow-lg shadow-blue-600/20 group"
+            >
+              Seguir no Facebook
+              <Facebook className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            </a>
           </div>
           <div className="relative">
             <div className="aspect-square bg-slate-800 rounded-2xl relative z-10 shadow-2xl border border-white/10 flex items-center justify-center">
@@ -296,7 +411,7 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
           <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-8">Comenta: EU SOU O UM</h2>
           <p className="text-blue-100 text-lg mb-10">Segue a página. Fica pronto para a nova era. O estoque é limitado e não haverá reposição.</p>
           <div className="flex justify-center gap-6">
-            <a href="#" className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold hover:bg-slate-950 hover:text-white transition-all flex items-center gap-2 shadow-lg">
+            <a href="https://www.instagram.com/da_cumbe?igsh=MTE4ZG5jeWloOThjaw==" target="_blank" rel="noreferrer" className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold hover:bg-slate-950 hover:text-white transition-all flex items-center gap-2 shadow-lg">
               <Instagram className="w-5 h-5" />
               Seguir no Instagram
             </a>
@@ -377,6 +492,7 @@ export default function App() {
             </button>
             <div className="hidden lg:flex gap-6 text-xs font-medium uppercase tracking-widest">
               <Link to="/gallery" className="hover:text-blue-400 transition-colors">Lançamentos</Link>
+              <a href="#servicos" className="hover:text-blue-400 transition-colors">Serviços</a>
               <a href="#sobre" className="hover:text-blue-400 transition-colors">Sobre Nós</a>
               <a href="#manifesto" className="hover:text-blue-400 transition-colors">Manifesto</a>
               <a href="mailto:daccumbe@gmail.com" className="hover:text-blue-400 transition-colors">Contato</a>
@@ -555,6 +671,7 @@ export default function App() {
               </div>
               <div className="flex flex-col gap-8">
                 <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-bold tracking-tight hover:text-blue-500 transition-colors">Lançamentos</Link>
+                <a href="#servicos" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-bold tracking-tight hover:text-blue-500 transition-colors">Serviços</a>
                 <a href="#sobre" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-bold tracking-tight hover:text-blue-500 transition-colors">Sobre Nós</a>
                 <a href="#manifesto" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-bold tracking-tight hover:text-blue-500 transition-colors">Manifesto</a>
                 <a href="mailto:daccumbe@gmail.com" onClick={() => setMobileMenuOpen(false)} className="text-4xl font-display font-bold tracking-tight hover:text-blue-500 transition-colors">Contato</a>
