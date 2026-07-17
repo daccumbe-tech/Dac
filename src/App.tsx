@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { ShoppingBag, Menu, X, ArrowRight, Instagram, MessageCircle, Facebook, ChevronRight, Calendar, Trash2, CheckCircle, Layout, RefreshCw, Target, Globe, Check } from 'lucide-react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
@@ -89,6 +89,102 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
       ...prev,
       [id]: { ...getProductState(id), ...updates }
     }));
+  };
+
+  const BASE_PRICES: Record<string, number> = {
+    "Landing Page": 7500,
+    "Website Institucional": 12000,
+    "E-Commerce / Loja Online": 25000,
+    "Blog / Portal": 10000
+  };
+
+  const FEATURE_PRICES: Record<string, number> = {
+    "Otimização SEO Avançada": 2500,
+    "Sistema de Pagamento Integrado": 4500,
+    "Suporte & Hospedagem Completa": 1500,
+    "Área de Login / Clientes": 6000
+  };
+
+  const ESTIMATED_TIMES: Record<string, string> = {
+    "Landing Page": "5 a 7 dias",
+    "Website Institucional": "7 a 14 dias",
+    "E-Commerce / Loja Online": "15 a 25 dias",
+    "Blog / Portal": "10 a 18 dias"
+  };
+
+  const [projectType, setProjectType] = useState("Landing Page");
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [companyName, setCompanyName] = useState("");
+  const [custEmail, setCustEmail] = useState("");
+  const [custPhone, setCustPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const basePrice = BASE_PRICES[projectType] || 7500;
+  const featuresPrice = selectedFeatures.reduce((acc, feat) => acc + (FEATURE_PRICES[feat] || 0), 0);
+  const totalPrice = basePrice + featuresPrice;
+  const estimatedTime = ESTIMATED_TIMES[projectType] || "7 dias";
+
+  const toggleFeature = (feat: string) => {
+    setSelectedFeatures(prev => 
+      prev.includes(feat) ? prev.filter(f => f !== feat) : [...prev, feat]
+    );
+  };
+
+  const handleWhatsAppQuote = () => {
+    const text = `Olá, Armando! Visitei o site D@C e gostaria de solicitar um orçamento para:\n\n` +
+      `*Projeto:* ${projectType}\n` +
+      `*Empresa/Projeto:* ${companyName || "Não informado"}\n` +
+      `*Recursos Extras:* ${selectedFeatures.length > 0 ? selectedFeatures.join(", ") : "Nenhum"}\n` +
+      `*Valor Estimado:* ${totalPrice} MT\n` +
+      `*Prazo Estimado:* ${estimatedTime}\n\n` +
+      `Gostaria de agendar uma conversa para detalhar os requisitos.`;
+    
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://wa.me/258833950740?text=${encodedText}`, "_blank");
+  };
+
+  const handleEmailQuote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitSuccess(false);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/service-quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectType,
+          features: selectedFeatures,
+          companyName,
+          customerEmail: custEmail,
+          customerPhone: custPhone,
+          totalPrice,
+          estimatedTime
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setCompanyName("");
+        setCustEmail("");
+        setCustPhone("");
+        setSelectedFeatures([]);
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+      } else {
+        const data = await response.json();
+        setSubmitError(data.error || "Erro ao enviar pedido de orçamento.");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar orçamento:", error);
+      setSubmitError("Erro de conexão com o servidor.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -258,29 +354,226 @@ function Home({ onImageClick, onAddToCart }: { onImageClick: (url: string) => vo
             <h3 className="text-xs font-bold text-blue-500 tracking-[0.2em] uppercase mb-4">Soluções Digitais</h3>
             <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-6">Criação de Websites Profissionais</h2>
             <p className="text-zinc-400 max-w-2xl text-lg leading-relaxed">
-              Criamos websites simples, rápidos e funcionais para ajudar o seu negócio a ter presença online e atrair mais clientes.
+              Criamos websites simples, rápidos e funcionais para ajudar o seu negócio a ter presença online e atrair mais clientes. Clique em um dos cartões abaixo para configurar seu orçamento personalizado!
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {SERVICES.map((service) => (
-              <motion.div 
-                key={service.id}
-                whileHover={{ y: -5 }}
-                className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all flex flex-col"
-              >
-                <div className="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-6">
-                  {service.icon === "Layout" && <Layout className="w-6 h-6 text-blue-500" />}
-                  {service.icon === "RefreshCw" && <RefreshCw className="w-6 h-6 text-blue-500" />}
-                  {service.icon === "Target" && <Target className="w-6 h-6 text-blue-500" />}
-                  {service.icon === "Globe" && <Globe className="w-6 h-6 text-blue-500" />}
+            {SERVICES.map((service) => {
+              const isSelected = 
+                (service.id === 1 && projectType === "Website Institucional") ||
+                (service.id === 2 && projectType === "Website Institucional" && selectedFeatures.includes("Suporte & Hospedagem Completa")) ||
+                (service.id === 3 && projectType === "Landing Page") ||
+                (service.id === 4 && projectType === "Website Institucional" && selectedFeatures.includes("Suporte & Hospedagem Completa"));
+
+              return (
+                <motion.div 
+                  key={service.id}
+                  whileHover={{ y: -5 }}
+                  onClick={() => {
+                    if (service.id === 1) {
+                      setProjectType("Website Institucional");
+                    } else if (service.id === 2) {
+                      setProjectType("Website Institucional");
+                      if (!selectedFeatures.includes("Suporte & Hospedagem Completa")) {
+                        setSelectedFeatures(p => [...p, "Suporte & Hospedagem Completa"]);
+                      }
+                    } else if (service.id === 3) {
+                      setProjectType("Landing Page");
+                    } else if (service.id === 4) {
+                      setProjectType("Website Institucional");
+                      if (!selectedFeatures.includes("Suporte & Hospedagem Completa")) {
+                        setSelectedFeatures(p => [...p, "Suporte & Hospedagem Completa"]);
+                      }
+                    }
+                    document.getElementById('orcamento-simulator')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`p-8 rounded-3xl border transition-all flex flex-col cursor-pointer ${
+                    isSelected 
+                      ? 'bg-blue-950/20 border-blue-500 shadow-lg shadow-blue-500/5' 
+                      : 'bg-slate-900/50 border-white/5 hover:border-blue-500/30'
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 ${
+                    isSelected ? 'bg-blue-600/20' : 'bg-blue-600/10'
+                  }`}>
+                    {service.icon === "Layout" && <Layout className="w-6 h-6 text-blue-500" />}
+                    {service.icon === "RefreshCw" && <RefreshCw className="w-6 h-6 text-blue-500" />}
+                    {service.icon === "Target" && <Target className="w-6 h-6 text-blue-500" />}
+                    {service.icon === "Globe" && <Globe className="w-6 h-6 text-blue-500" />}
+                  </div>
+                  <h4 className="text-lg font-display font-bold mb-4">{service.title}</h4>
+                  <p className="text-zinc-500 text-sm leading-relaxed mb-6">
+                    {service.description}
+                  </p>
+                  <span className="text-xs font-bold text-blue-400 mt-auto flex items-center gap-1 group">
+                    Selecionar e Simular <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Interactive Budget Simulator */}
+          <div id="orcamento-simulator" className="mb-16 bg-slate-900/40 border border-white/5 rounded-[2.5rem] p-6 md:p-12">
+            <div className="max-w-3xl mx-auto text-center mb-12">
+              <span className="text-blue-500 text-xs uppercase font-bold tracking-widest bg-blue-600/10 px-4 py-1.5 rounded-full">Ferramenta Interativa</span>
+              <h3 className="text-3xl font-display font-bold mt-4 mb-4">Simulador de Orçamento de Website</h3>
+              <p className="text-zinc-400 text-sm">Configure o seu site ideal e tenha uma estimativa automática de valor e prazo para o seu negócio.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              {/* Simulator Options */}
+              <div className="lg:col-span-7 space-y-8">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-4">1. Tipo de Website</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {Object.keys(BASE_PRICES).map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setProjectType(type)}
+                        className={`p-4 rounded-2xl border text-left transition-all flex flex-col ${
+                          projectType === type 
+                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/10' 
+                            : 'bg-slate-900/60 border-white/5 text-zinc-400 hover:border-white/20'
+                        }`}
+                      >
+                        <span className="font-bold text-sm mb-1">{type}</span>
+                        <span className={`text-xs ${projectType === type ? 'text-blue-100' : 'text-zinc-500'}`}>
+                          A partir de {BASE_PRICES[type]} MT
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <h4 className="text-lg font-display font-bold mb-4">{service.title}</h4>
-                <p className="text-zinc-500 text-sm leading-relaxed">
-                  {service.description}
-                </p>
-              </motion.div>
-            ))}
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-4">2. Recursos Adicionais</label>
+                  <div className="space-y-3">
+                    {Object.keys(FEATURE_PRICES).map((feature) => {
+                      const isSelected = selectedFeatures.includes(feature);
+                      return (
+                        <div
+                          key={feature}
+                          onClick={() => toggleFeature(feature)}
+                          className={`p-4 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
+                            isSelected 
+                              ? 'bg-blue-950/20 border-blue-500/50' 
+                              : 'bg-slate-900/60 border-white/5 hover:border-white/10'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${
+                              isSelected ? 'bg-blue-600 border-blue-600' : 'border-zinc-700'
+                            }`}>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                            </div>
+                            <span className="text-sm font-medium text-zinc-300">{feature}</span>
+                          </div>
+                          <span className="text-xs font-bold text-blue-400">+{FEATURE_PRICES[feature]} MT</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Estimate Summary & Submission */}
+              <div className="lg:col-span-5 flex flex-col">
+                <div className="bg-slate-900 border border-white/10 rounded-3xl p-6 md:p-8 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-6 pb-4 border-b border-white/5">Resumo da Configuração</h4>
+                    
+                    <div className="space-y-4 mb-8">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zinc-500">Tipo de Projeto:</span>
+                        <span className="text-white font-bold">{projectType}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zinc-500">Recursos Extras:</span>
+                        <span className="text-white font-bold">{selectedFeatures.length} selecionados</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-zinc-500">Prazo de Entrega:</span>
+                        <span className="text-blue-400 font-bold">{estimatedTime}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-600/5 rounded-2xl p-6 border border-blue-600/10 mb-8 text-center">
+                      <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-2">Valor Estimado Total</p>
+                      <p className="text-4xl font-display font-bold text-blue-500">{totalPrice.toLocaleString()} MT</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleEmailQuote} className="space-y-4">
+                    <div>
+                      <input 
+                        type="text" 
+                        required
+                        placeholder="Nome da sua Empresa ou Projeto" 
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-xs focus:ring-1 focus:ring-blue-600 text-white placeholder-zinc-600" 
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input 
+                        type="email" 
+                        required
+                        placeholder="Seu E-mail" 
+                        value={custEmail}
+                        onChange={(e) => setCustEmail(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-xs focus:ring-1 focus:ring-blue-600 text-white placeholder-zinc-600" 
+                      />
+                      <input 
+                        type="tel" 
+                        required
+                        placeholder="WhatsApp / Telefone" 
+                        value={custPhone}
+                        onChange={(e) => setCustPhone(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-xs focus:ring-1 focus:ring-blue-600 text-white placeholder-zinc-600" 
+                      />
+                    </div>
+
+                    {submitSuccess && (
+                      <div className="bg-green-500/10 border border-green-500 text-green-500 p-4 rounded-xl text-center text-xs font-bold">
+                        🎉 Pedido de orçamento enviado com sucesso! Entraremos em contato por e-mail e WhatsApp.
+                      </div>
+                    )}
+
+                    {submitError && (
+                      <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl text-center text-xs font-bold">
+                        ⚠️ {submitError}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-2 pt-2">
+                      <button 
+                        type="button"
+                        onClick={handleWhatsAppQuote}
+                        className="w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-opacity-95 transition-all shadow-lg shadow-[#25D366]/10"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        ENVIAR POR WHATSAPP
+                      </button>
+                      <button 
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-white hover:text-blue-600 transition-all shadow-lg shadow-blue-600/10"
+                      >
+                        {isSubmitting ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <CheckCircle className="w-4 h-4" />
+                        )}
+                        RECEBER POR E-MAIL
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-blue-600/5 rounded-[2rem] p-8 md:p-12 border border-blue-600/10">

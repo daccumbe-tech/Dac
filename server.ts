@@ -66,6 +66,54 @@ async function startServer() {
     }
   });
 
+  app.post("/api/service-quote", async (req, res) => {
+    const { projectType, features, companyName, customerEmail, customerPhone, totalPrice, estimatedTime } = req.body;
+
+    const adminEmail = "daccumbe@gmail.com";
+    
+    const emailBody = `
+      Novo Pedido de Orçamento de Website recebido!
+      
+      Detalhes do Projeto:
+      - Tipo de Website: ${projectType}
+      - Recursos Selecionados: ${features && features.length > 0 ? features.join(", ") : "Nenhum extra"}
+      - Nome da Empresa/Projeto: ${companyName || "Não informado"}
+      - Valor Estimado: ${totalPrice} MT
+      - Prazo Estimado: ${estimatedTime}
+      
+      Contato do Cliente:
+      - E-mail: ${customerEmail || "Não informado"}
+      - WhatsApp: ${customerPhone || "Não informado"}
+    `;
+
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        await transporter.sendMail({
+          from: `"D@C Store - Orçamentos" <${process.env.SMTP_USER}>`,
+          to: adminEmail,
+          subject: `Orçamento de Website - ${companyName || "Novo Cliente"}`,
+          text: emailBody,
+        });
+        console.log("E-mail de orçamento enviado com sucesso para o administrador.");
+      } else {
+        console.warn("SMTP_USER ou SMTP_PASS não configurados. E-mail de orçamento não enviado.");
+      }
+
+      res.json({ success: true, message: "Pedido de orçamento enviado com sucesso!" });
+    } catch (error) {
+      console.error("Erro ao processar orçamento:", error);
+      res.status(500).json({ error: "Erro ao processar orçamento" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
